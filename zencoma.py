@@ -1,0 +1,220 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import commands
+import re
+import os
+
+def partition_by_character(string,character):
+    index = string.find(character)
+    if index == -1:
+        return [string]
+    else:
+        result = [string[:index+1]]
+        result.extend(partition_by_character(string[index+1:],character))
+        return filter(lambda x:x!="", result)
+
+def partition_by_vowel(string):
+    result = [string]
+    vowel = "aiueo"
+    for i in vowel:
+        buf = [];
+        for j in result:
+            buf.extend(partition_by_character(j,i))
+        result = buf
+    return result
+
+def left_out(string,symbol):
+    if string.find(symbol) == -1:
+        return [string]
+    else:
+        result = []
+        buf = string.partition(symbol)
+        result.extend(buf[0:2])
+        result.extend(left_out(buf[2],symbol))
+    return filter(lambda x:x!="", result)
+
+def partition_by_symbol(string):
+    symbol = "!\"#$%&'()*+,-./1234567890:;<=>?@[\]^_`{|}~"
+    result = [string]
+    for i in symbol:
+        buf = []
+        for j in result:
+            buf.extend(left_out(j,i))
+        result = buf
+    return result
+
+def partition_by_consonant(string):
+    result = []
+    length = len(string)
+    if(length>=2):
+        #kyaとかgya
+        if string[0] in "kgszjtcdnhmrgbplfv":
+            #2文字目ががyで3文字目が母音
+            if length>=3 and string[1] in "y" and string[2] in "aiueo":
+                result.extend([string[:3]])
+                result.extend(partition_by_consonant(string[3:]))
+                return result
+            #2文字目が母音
+            elif string[1] in "aiueo":
+                result.extend([string[0:2]])
+                result.extend(partition_by_consonant(string[2:]))
+                return result
+        #shaとかtha
+        if string[0] in "stcd":
+            if length>=3 and string[1] in "h" and string[2] in "aiueo":
+                result.extend([string[:3]])
+                result.extend(partition_by_consonant(string[3:]))
+                return result
+            elif string[1] in "aiueo":
+                result.extend([string[0:2]])
+                result.extend(partition_by_consonant(string[2:]))
+                return result
+        #小さいつ
+        if string[0] in "xl":
+            if len(string)>=4 and string[1] == "t" and string[2] == "s" and string[3] == "u":
+                result.extend([string[:4]])
+                result.extend(partition_by_consonant(string[4:]))
+                return result
+            elif string[1] in "aiueo":
+                result.extend([string[:2]])
+                result.extend(partition_by_consonant(string[3:]))
+                return result
+        #その他
+        #2文字目が母音
+        if string[1] in "aiueo":
+            result.extend([string[0:2]])
+            result.extend(partition_by_consonant(string[2:]))
+        else:
+            result.extend([string[0]])
+            result.extend(partition_by_consonant(string[1:]))
+    else:
+        result.extend([string])
+    return result
+
+#空白の取り除きやnや小さいつのチェック
+def check(partitioned):
+    result = []
+    length = len(partitioned)
+    for i in range(0,length-1):
+        if partitioned[i]:
+            if partitioned[i] == "n" and partitioned[i+1] == "n":
+                result.append("nn")
+                partitioned[i+1] = ""
+            elif len(partitioned[i]) == 1 and partitioned[i][0] not in "aiueo1234567890" and partitioned[i][0] == partitioned[i+1][0]:
+                result.append("ltsu")
+            else:
+                result.append(partitioned[i])
+        
+    result.append(partitioned[length-1])
+    return filter(lambda x:x!="",result)
+
+def lexer(string):
+    buf = []
+    result = []
+    for i in partition_by_vowel(string):
+        buf.extend(partition_by_symbol(i))
+    for i in buf:
+        result.extend(partition_by_consonant(i))
+    return check(result)
+
+def eval(string):
+    result = "";
+    dict = {
+        "a"    : "あ", "i"    : "い", "u"    : "う", "e"    : "え", "o"    : "お",
+        "ka"   : "か", "ki"   : "き", "ku"   : "く", "ke"   : "け", "ko"   : "こ",
+        "sa"   : "さ", "si"   : "し", "su"   : "す", "se"   : "せ", "so"   : "そ",
+        "ta"   : "た", "ti"   : "ち", "tu"   : "つ", "te"   : "て", "to"   : "と",
+        "na"   : "な", "ni"   : "に", "nu"   : "ぬ", "ne"   : "ね", "no"   : "の",
+        "ha"   : "は", "hi"   : "ひ", "hu"   : "ふ", "he"   : "へ", "ho"   : "ほ",
+        "ma"   : "ま", "mi"   : "み", "mu"   : "む", "me"   : "め", "mo"   : "も",
+        "ya"   : "や", "yi"   : "ｙい","yu"   : "ゆ", "ye"   : "いぇ", "yo"  : "よ",
+        "ra"   : "ら", "ri"   : "り", "ru"   : "る", "re"   : "れ", "ro"   : "ろ",
+        "wa"   : "わ", "wi"   : "うぃ", "wu"   : "う", "we"   : "うぇ", "wo"   : "を",
+        "nn"   : "ん",
+        "ga"   : "が", "gi"   : "ぎ", "gu"   : "ぐ", "ge"   : "げ", "go"   : "ご",
+        "za"   : "ざ", "zi"   : "じ", "zu"   : "ず", "ze"   : "ぜ", "zo"   : "ぞ",
+        "da"   : "だ", "di"   : "ぢ", "du"   : "づ", "de"   : "で", "do"   : "ど",
+        "ba"   : "ば", "bi"   : "び", "bu"   : "ぶ", "be"   : "べ", "bo"   : "ぼ",
+        "pa"   : "ぱ", "pi"   : "ぴ", "pu"   : "ぷ", "pe"   : "ぺ", "po"   : "ぽ",
+        "la"   : "ぁ", "li"   : "ぃ", "lu"   : "ぅ", "le"   : "ぇ", "lo"   : "ぉ",
+        "xa"   : "ぁ", "xi"   : "ぃ", "xu"   : "ぅ", "xe"   : "ぇ", "xo"   : "ぉ",
+        "fa"   : "ふぁ", "fi"   : "ふぃ", "fu"   : "ふ", "fe"   : "ふぇ", "fo"   : "ふぉ",
+        "ja"   : "じゃ", "ji"   : "じ", "ju"   : "じゅ", "je"   : "じぇ", "jo"   : "じょ",
+        "ca"   : "か", "ci"   : "し", "cu"   : "く", "ce"   : "せ", "co"   : "こ",
+        "va"   : "ヴぁ", "vi"   : "ヴぃ", "vu"   : "ヴ", "ve"   : "ヴぇ", "vo"   : "ヴぉ",
+        "qa"   : "くぁ", "qi"   : "くぃ", "qu"   : "く", "qe"   : "くぇ", "qo"   : "くぉ",
+        "kya"  : "きゃ", "kyi"  : "きぃ", "kyu"  : "きゅ", "kye"  : "きぇ", "kyo"  : "きょ",
+        "gya"  : "ぎゃ","gyi"   : "ぎぃ", "gyu"  : "ぎゅ", "gye"  : "ぎぇ", "gyo"  : "ぎょ",
+        "sya"  : "しゃ", "syi"  : "しぃ", "syu"  : "しゅ", "sye"  : "しぇ", "syo"  : "しょ",
+        "sha"  : "しゃ", "shi"  : "し"  , "shu"  : "しゅ", "she"  : "しぇ", "sho"  : "しょ",
+        "zya"  : "じゃ", "zyi"  : "じぃ", "zyu"  : "じゅ", "zye"  : "じぇ", "zyo"  : "じょ",
+        "jya"  : "じゃ", "jyi"  : "じぃ", "jyu"  : "じゅ", "jye"  : "じぇ", "jyo"  : "じょ",
+        "tya"  : "ちゃ", "tyi"  : "ちぃ", "tyu"  : "ちゅ", "tye"  : "ちぇ", "tyo"  : "ちょ",
+        "tha"  : "てゃ", "thi"  : "てぃ", "thu"  : "てゅ", "the"  : "てぇ", "tho"  : "てょ",
+        "cya"  : "ちゃ", "cyi"  : "ちぃ", "cyu"  : "ちゅ", "cye"  : "ちぇ", "cyo"  : "ちょ",
+        "cha"  : "ちゃ", "chi"  : "ち"  , "chu"  : "ちゅ", "che"  : "ちぇ", "cho"  : "ちょ",
+        "dya"  : "ぢゃ", "dyi"  : "ぢぃ", "dyu"  : "ぢゅ", "dye"  : "ぢぇ", "dyo"  : "ぢょ",
+        "dha"  : "でゃ", "dhi"  : "でぃ", "dhu"  : "でゅ", "dhe"  : "でぇ", "dho"  : "でょ",
+        "tsa"  : "つぁ", "tsi"  : "つぃ", "tsu"  : "つ",   "tse"  : "つぇ", "tso"  : "つぉ",
+        "nya"  : "にゃ", "nyi"  : "にぃ", "nyu"  : "にゅ", "nye"  : "にぇ", "nyo"  : "にょ",
+        "hya"  : "ひゃ", "hyi"  : "ひぃ", "hyu"  : "ひゅ", "hye"  : "ひぇ", "hyo"  : "ひょ",
+        "mya"  : "みゃ", "myi"  : "みぃ", "myu"  : "みゅ", "mye"  : "みぇ", "myo"  : "みょ",
+        "rya"  : "りゃ", "ryi"  : "りぃ", "ryu"  : "りゅ", "rye"  : "りぇ", "ryo"  : "りょ",
+        "gya"  : "ぎゃ", "gyi"  : "ぎぃ", "gyu"  : "ぎゅ", "gye"  : "ぎぇ", "gyo"  : "ぎょ",
+        "bya"  : "びゃ", "byi"  : "びぃ", "byu"  : "びゅ", "bye"  : "びぇ", "byo"  : "びょ",
+        "pya"  : "ぴゃ", "pyi"  : "ぴぃ", "pyu"  : "ぴゅ", "pye"  : "ぴぇ", "pyo"  : "ぴょ",
+        "lya"  : "ゃ", "lyi"  : "ぃ", "lyu"  : "ゅ", "lye"  : "ぇ", "lyo"  : "ょ",
+        "fya"  : "ふゃ", "fyi"  : "ｆｙい", "fyu" : "ふゅ", "fye" : "ｆｙえ", "fyo" : "ふょ",
+        "vya"  : "ヴゃ", "vyi" : "ヴぃ", "vyu" : "ヴゅ", "vye" : "ヴぇ", "vyo" : "ヴょ",
+        "ltsu" : "っ", "xtsu" : "っ", 
+        "b"    : "ｂ", "c"    : "ｃ", "d"    : "ｄ", "f"    : "ｆ", "g"    : "ｇ",
+        "h"    : "ｈ", "j"    : "ｊ", "k"    : "ｋ", "l"    : "ｌ", "m"    : "ｍ",
+        "n"    : "ｎ", "p"    : "ｐ", "q"    : "ｑ", "r"    : "ｒ", "s"    : "ｓ",
+        "t"    : "ｔ", "v"    : "ｖ", "w"    : "ｗ", "x"    : "ｘ", "y"    : "ｙ",
+        "z"    : "ｚ",
+        "!"    : "！", "\\"   : "￥", "\""   : "”", "#"    : "＃", "$"    : "＄",
+        "%"    : "％", "&"    : "＆", "'"    : "’", "("    : "（", ")"    : "）",
+        "*"    : "＊", "+"    : "＋", ","    : "、", "-"    : "ー", "."    : "。",
+        "/"    : "・",
+        "1"    : "１", "2"    : "２", "3"    : "３", "4"    : "４",
+        "5"    : "５", "6"    : "６", "7"    : '７', "8"    : '８', "9"    : '９',
+        "0"    : '０',
+        ":"    : '：', ";"    : '；', "<"    : '＜', "="    : '＝', ">"    : '＞',
+        "?"    : '？', "@"    : '＠', "["    : '「', "]"    : '」', "^"    : '＾',
+        "_"    : '＿', "`"    : '’', "{"    :'｛', "|"    : '｜', "}"    : '｝',
+        "~"    : '〜'}
+    for i in lexer(string.lower()):
+        result += dict[i]
+    return result
+
+def get_commands():
+    hancoma = []
+    for i in commands.getoutput("echo $PATH").split(":"):
+        hancoma.extend(commands.getoutput("ls " + i).split())
+    return hancoma
+        
+def get_alias():
+    result = []
+    shellrc = "." + commands.getoutput("echo $SHELL").split("/").pop() + "rc"
+    for i in commands.getoutput("grep 'alias ' ~/" + shellrc).split("\n"):
+        result.append([re.search("\s([^=]*)=",i).group(1).strip("\"\'"), re.search("=([^\Z]*)\Z",i).group(1).strip("\"\'"),])
+    return result
+
+def main():
+    if __name__ == "__main__":
+        path = os.environ['HOME'] + "/.zencoma"
+        if os.path.exists(path):
+            os.remove(path)
+            f = open(path,"w")
+            for i in get_commands():
+                alias = "alias \"" + eval(i) + "\"=" + "\"" + i + "\"\n"
+                f.write(alias)
+                print alias
+            for i in get_alias():
+                alias = "alias \"" + eval(i[0]) + "\"=" + "\"" + i[1] + "\"\n"
+                f.write(alias)
+                print alias
+            f.close()
+        
+main()
