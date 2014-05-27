@@ -206,15 +206,15 @@ def main():
         path = os.environ['HOME'] + "/.zencoma"
         if os.path.exists(path):
             os.remove(path)
-            f = open(path,"w")
-            for i in get_commands():
-                alias = "alias \"" + eval(i) + "\"=" + "\"" + i + "\"\n"
-                f.write(alias)
-                print alias
-            for i in get_alias():
-                alias = "alias \"" + eval(i[0]) + "\"=" + "\"" + i[1] + "\"\n"
-                f.write(alias)
-                print alias
-            f.close()
-        
+        f = open(path,"w")
+        for i in get_commands():
+            alias = "alias \"" + eval(i) + "\"=" + "\"" + i + "\"\n"
+            f.write(alias)
+            print alias
+        for i in get_alias():
+            alias = "alias \"" + eval(i[0]) + "\"=" + "\"" + i[1] + "\"\n"
+            f.write(alias)
+            print alias
+        f.close()
+        commands.getoutput("source " + path)
 main()
