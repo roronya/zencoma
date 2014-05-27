@@ -19,18 +19,22 @@ source $HOME/.zencoma
 
 ##使い方
 
-zencomaを実行すると、~/.zencoma にalias集が書き込まれ、適用されます。
+zencomaを実行すると、~/.zencoma にalias集が書き込まれます。
 
 ```shellscript
 $ zencoma
-alias "ぜｎこま"="zencoma"
-alias "ねｔをｒｋまなげｒ"="NetworkManager"
-alias "あっせｐｔ"="accept"
-alias "あっせっｓｄｂ"="accessdb"
-.
-.
-.
+updating ~/.zencoma
+done.
 ```
+
+インストール方法の4番に則りシェルの設定ファイルから.zencomaを読み込むようにしてあれば、次回シェルへログインしたときから全角でのコマンドが有効になります。
+
+またすぐに適用したい場合は以下を実行してください。
+
+```shellscript
+$ source ~/.zencoma
+```
+
 ##例
 
 ```shellscript
