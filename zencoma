@@ -210,11 +210,11 @@ def main():
         for i in get_commands():
             alias = "alias \"" + eval(i) + "\"=" + "\"" + i + "\"\n"
             f.write(alias)
-            print alias
+            print alias.strip("\n")
         for i in get_alias():
             alias = "alias \"" + eval(i[0]) + "\"=" + "\"" + i[1] + "\"\n"
             f.write(alias)
-            print alias
+            print alias.strip("\n")
         f.close()
         commands.getoutput("source " + path)
 main()

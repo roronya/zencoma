@@ -17,6 +17,26 @@ source $HOME/.zencoma
 
 ##使い方
 
+zencomaを実行すると、~/.zencoma にalias集が書き込まれ、適用されます。
+
 ```shellscript
 $ zencoma
+alias "ぜｎこま"="zencoma"
+alias "ねｔをｒｋまなげｒ"="NetworkManager"
+alias "あっせｐｔ"="accept"
+alias "あっせっｓｄｂ"="accessdb"
+.
+.
+.
+```
+##例
+
+```shellscript
+#半角
+$ ls
+Dropbox  backup  bin  documents  downloads  images  music  tmp  videos
+
+#全角
+$ ｌｓ
+Dropbox  backup  bin  documents  downloads  images  music  tmp  videos
 ```
