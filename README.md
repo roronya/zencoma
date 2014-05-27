@@ -46,3 +46,8 @@ Dropbox  backup  bin  documents  downloads  images  music  tmp  videos
 $ ｌｓ
 Dropbox  backup  bin  documents  downloads  images  music  tmp  videos
 ```
+
+##注意点
++ アルファベットからひらがなへの変換はibus-mozcの辞書にしたがっています。概ね同じ挙動だと想いますが、ibus-mozc以外のIMEの環境では完璧に動作しないかもしれません。
++ 新しくソフトウェアをインストールなどしてコマンドが増えた場合は逐一zencomaを実行しないと新しいコマンドの全角コマンドaliasは生成されません。
+
