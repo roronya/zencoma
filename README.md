@@ -4,6 +4,8 @@
 
 半角に切り替え忘れて全角でコマンドを叩いてしまった時でも、そのままエンターキーを叩けばコマンドが実行できるようになります。
 
+*※python2系でしか動きません。*
+
 ##インストール方法
 
 1. zencomaスクリプトをダンロードしてください(https://raw.githubusercontent.com/roronya/zencoma/master/zencoma)

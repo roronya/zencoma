@@ -197,7 +197,7 @@ def get_commands():
 def get_alias():
     result = []
     shellrc = "." + commands.getoutput("echo $SHELL").split("/").pop() + "rc"
-    for i in commands.getoutput("grep 'alias ' ~/" + shellrc).split("\n"):
+    for i in filter(lambda x:x!="", commands.getoutput("grep 'alias ' ~/" + shellrc).split("\n")):
         result.append([re.search("\s([^=]*)=",i).group(1).strip("\"\'"), re.search("=([^\Z]*)\Z",i).group(1).strip("\"\'"),])
     return result
 
@@ -206,15 +206,19 @@ def main():
         path = os.environ['HOME'] + "/.zencoma"
         if os.path.exists(path):
             os.remove(path)
+
+        print "updating ~/.zencoma"
+
         f = open(path,"w")
         for i in get_commands():
             alias = "alias \"" + eval(i) + "\"=" + "\"" + i + "\"\n"
             f.write(alias)
-            print alias.strip("\n")
         for i in get_alias():
             alias = "alias \"" + eval(i[0]) + "\"=" + "\"" + i[1] + "\"\n"
             f.write(alias)
-            print alias.strip("\n")
         f.close()
         commands.getoutput("source " + path)
+
+        print "done."
+
 main()
