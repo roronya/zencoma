@@ -101,6 +101,8 @@ def check(partitioned):
             if partitioned[i] == "n" and partitioned[i+1] == "n":
                 result.append("nn")
                 partitioned[i+1] = ""
+            elif partitioned[i] == "n" and partitioned[i+1] != "aiueo":
+                result.append("nn")
             elif len(partitioned[i]) == 1 and partitioned[i][0] not in "aiueo1234567890" and partitioned[i][0] == partitioned[i+1][0]:
                 result.append("ltsu")
             else:
@@ -220,5 +222,4 @@ def main():
         commands.getoutput("source " + path)
 
         print "done."
-
 main()
