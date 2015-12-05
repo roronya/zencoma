@@ -196,13 +196,6 @@ def get_commands():
         hancoma.extend(commands.getoutput("ls " + i).split())
     return hancoma
         
-def get_alias():
-    result = []
-    shellrc = "." + commands.getoutput("echo $SHELL").split("/").pop() + "rc"
-    for i in filter(lambda x:x!="", commands.getoutput("grep 'alias ' ~/" + shellrc).split("\n")):
-        result.append([re.search("\s([^=]*)=",i).group(1).strip("\"\'"), re.search("=([^\Z]*)\Z",i).group(1).strip("\"\'"),])
-    return result
-
 def main():
     if __name__ == "__main__":
         path = os.environ['HOME'] + "/.zencoma"
@@ -214,9 +207,6 @@ def main():
         f = open(path,"w")
         for i in get_commands():
             alias = "alias \"" + eval(i) + "\"=" + "\"" + i + "\"\n"
-            f.write(alias)
-        for i in get_alias():
-            alias = "alias \"" + eval(i[0]) + "\"=" + "\"" + i[1] + "\"\n"
             f.write(alias)
         f.close()
         commands.getoutput("source " + path)
