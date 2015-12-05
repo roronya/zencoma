@@ -185,7 +185,7 @@ def eval(string):
         ":"    : '：', ";"    : '；', "<"    : '＜', "="    : '＝', ">"    : '＞',
         "?"    : '？', "@"    : '＠', "["    : '「', "]"    : '」', "^"    : '＾',
         "_"    : '＿', "`"    : '’', "{"    :'｛', "|"    : '｜', "}"    : '｝',
-        "~"    : '〜'}
+        "~"    : '〜', ' '    : '　'}
     for i in lexer(string.lower()):
         result += dict[i]
     return result
@@ -222,4 +222,5 @@ def main():
         commands.getoutput("source " + path)
 
         print "done."
+
 main()
