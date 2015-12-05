@@ -41,12 +41,16 @@ $ source ~/.zencoma
 
 ```shellscript
 #半角
-$ ls
-Dropbox  backup  bin  documents  downloads  images  music  tmp  videos
+> cat test.php                                                                                                                                                                                                        ~@MT-PRO1200
+<?php
+
+http_head('http://example.com');
 
 #全角
-$ ｌｓ
-Dropbox  backup  bin  documents  downloads  images  music  tmp  videos
+> かｔ test.php                                                                                                                                                                                                       ~@MT-PRO1200
+<?php
+
+http_head('http://example.com');
 ```
 
 ##注意点
